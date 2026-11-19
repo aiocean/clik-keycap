@@ -1,0 +1,27 @@
+[package]
+name = "clik-keycap"
+version = "0.1.0"
+edition = "2024"
+description = "clik plugin: a keyboard key shape"
+license = "MIT"
+repository = "https://github.com/aiocean/clik-keycap"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+clik-plugin = "1"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+
+# Standalone crate, not part of any parent workspace.
+[workspace]

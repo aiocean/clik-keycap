@@ -1,0 +1,27 @@
+id = "keycap"
+name = "Keycap"
+version = "0.1.0"
+api = 1
+
+[[steps]]
+name = "keycap"
+label = "Keycap"
+role = "shape"
+
+[[steps.props]]
+key = "label"
+label = "Label"
+kind = "text"
+default = "⌘K"
+
+[[steps.props]]
+key = "theme"
+label = "Theme"
+kind = { enum = ["light", "dark"] }
+default = "light"
+
+[[steps.props]]
+key = "size"
+label = "Font size"
+kind = { number = { min = 10, max = 48 } }
+default = 16

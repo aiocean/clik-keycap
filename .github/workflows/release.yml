@@ -1,0 +1,31 @@
+# .github/workflows/release.yml
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo install --locked wasm-tools
+      - name: Build the package
+        run: |
+          cargo build --release --target wasm32-unknown-unknown
+          id=$(grep -m1 '^id' plugin.toml | cut -d'"' -f2)
+          version=$(grep -m1 '^version' plugin.toml | cut -d'"' -f2)
+          crate=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name | gsub("-"; "_")')
+          mkdir pkg
+          wasm-tools component new "target/wasm32-unknown-unknown/release/$crate.wasm" -o pkg/plugin.wasm
+          cp plugin.toml pkg/
+          if [ -d icons ]; then cp -R icons pkg/; fi
+          echo "PACKAGE=$id-$version.clikplugin.tar.gz" >> "$GITHUB_ENV"
+          (cd pkg && tar -czf "../$id-$version.clikplugin.tar.gz" *)
+      - run: gh release create "$GITHUB_REF_NAME" "$PACKAGE" --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
